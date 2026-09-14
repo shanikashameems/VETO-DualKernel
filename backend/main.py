@@ -1,7 +1,10 @@
 import time
 import datetime
+from pathlib import Path
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from typing import Dict, Any, List
 
 from .models import (
@@ -261,4 +264,24 @@ def run_benchmark(payload: Dict[str, Any] = {}):
     return {
         "benchmark_executed": num_tests,
         "metrics": compute_telemetry_metrics().model_dump()
+    }
+
+# Mount static dist assets and serve index.html for SPA frontend
+DIST_DIR = Path(__file__).resolve().parent.parent / "dist"
+
+if (DIST_DIR / "assets").exists():
+    app.mount("/assets", StaticFiles(directory=str(DIST_DIR / "assets")), name="assets")
+
+@app.get("/{full_path:path}")
+def serve_spa(full_path: str):
+    if full_path.startswith("api"):
+        return Response(status_code=404)
+    index_file = DIST_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    return {
+        "status": "ONLINE",
+        "proxy": "localhost:8000/veto",
+        "boundary": "VETO-DualKernel Active",
+        "timestamp": datetime.datetime.now().isoformat()
     }
