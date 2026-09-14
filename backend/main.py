@@ -72,6 +72,15 @@ def compute_telemetry_metrics() -> TelemetryMetrics:
         false_positive_pct=round(false_pos_pct, 1)
     )
 
+@app.get("/")
+def get_root():
+    return {
+        "status": "ONLINE",
+        "proxy": "localhost:8000/veto",
+        "boundary": "VETO-DualKernel Active",
+        "timestamp": datetime.datetime.now().isoformat()
+    }
+
 @app.get("/api/status")
 def get_status():
     return {
