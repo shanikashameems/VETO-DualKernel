@@ -2,8 +2,9 @@ import re
 from pathlib import Path
 from .models import CandidateParameters
 
-CLEAN_PATH = Path("D:/Veto/data/clean_invoice_1042.txt")
-POISONED_PATH = Path("D:/Veto/data/poisoned_invoice_1042.txt")
+BASE_DIR = Path(__file__).resolve().parent.parent
+CLEAN_PATH = BASE_DIR / "data" / "clean_invoice_1042.txt"
+POISONED_PATH = BASE_DIR / "data" / "poisoned_invoice_1042.txt"
 
 def read_document_text(doc_type: str) -> str:
     if doc_type == "clean" and CLEAN_PATH.exists():

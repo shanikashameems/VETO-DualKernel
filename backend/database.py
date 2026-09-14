@@ -3,7 +3,14 @@ import os
 from pathlib import Path
 from typing import Optional, Dict, List
 
-DB_PATH = Path("D:/Veto/data/veto.db")
+BASE_DIR = Path(__file__).resolve().parent.parent
+DB_PATH = BASE_DIR / "data" / "veto.db"
+
+# Fallback to /tmp on Vercel serverless if data dir is read-only
+try:
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+except Exception:
+    DB_PATH = Path("/tmp/veto.db")
 
 def init_db():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
