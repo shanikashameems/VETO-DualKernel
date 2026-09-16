@@ -8,6 +8,10 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ vetoMode, setVetoMode, isBackendOnline }) => {
+  const activeProxy = typeof window !== 'undefined' && !window.location.hostname.includes('localhost')
+    ? `${window.location.host}/api`
+    : 'localhost:8000/veto';
+
   return (
     <header className="bg-[#0F1117] text-white border-b border-[#2D3748] px-6 py-4 flex flex-col md:flex-row justify-between items-center shadow-lg">
       {/* LEFT: Branding & Execution Boundary */}
@@ -33,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({ vetoMode, setVetoMode, isBackend
         <div className="flex items-center space-x-2">
           <Activity className="w-3.5 h-3.5 text-gray-400" />
           <span className="text-gray-400">ACTIVE PROXY:</span>
-          <span className="text-gray-200">localhost:8000/veto</span>
+          <span className="text-gray-200">{activeProxy}</span>
         </div>
         <div className="h-3 w-px bg-gray-700 mx-1"></div>
         {isBackendOnline ? (
