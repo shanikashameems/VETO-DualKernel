@@ -47,10 +47,26 @@ def init_db():
             decision TEXT NOT NULL,
             reason TEXT NOT NULL,
             bank_api_called INTEGER NOT NULL,
-            gateway_latency_ms REAL NOT NULL
+            bank_call_count INTEGER NOT NULL DEFAULT 0,
+            gateway_latency_ms REAL NOT NULL,
+            previous_hash TEXT NOT NULL DEFAULT '',
+            current_hash TEXT NOT NULL DEFAULT '',
+            signature TEXT NOT NULL DEFAULT ''
         )
     """)
     
+    # Add columns if migrating existing table
+    for col, ctype in [
+        ("bank_call_count", "INTEGER NOT NULL DEFAULT 0"),
+        ("previous_hash", "TEXT NOT NULL DEFAULT ''"),
+        ("current_hash", "TEXT NOT NULL DEFAULT ''"),
+        ("signature", "TEXT NOT NULL DEFAULT ''")
+    ]:
+        try:
+            cursor.execute(f"ALTER TABLE audit_logs ADD COLUMN {col} {ctype}")
+        except Exception:
+            pass
+
     # Seed vendors if empty
     cursor.execute("SELECT COUNT(*) FROM erp_vendors")
     if cursor.fetchone()[0] == 0:
@@ -92,14 +108,17 @@ def save_audit_log(log_data: dict):
         INSERT INTO audit_logs (
             audit_id, timestamp, mandate_id, vendor, invoice_id, amount,
             received_beneficiary, verified_beneficiary, provenance_state,
-            decision, reason, bank_api_called, gateway_latency_ms
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            decision, reason, bank_api_called, bank_call_count, gateway_latency_ms,
+            previous_hash, current_hash, signature
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         log_data["audit_id"], log_data["timestamp"], log_data["mandate_id"],
         log_data["vendor"], log_data["invoice_id"], log_data["amount"],
         log_data["received_beneficiary"], log_data["verified_beneficiary"],
         log_data["provenance_state"], log_data["decision"], log_data["reason"],
-        1 if log_data["bank_api_called"] else 0, log_data["gateway_latency_ms"]
+        1 if log_data["bank_api_called"] else 0, log_data.get("bank_call_count", 0),
+        log_data["gateway_latency_ms"],
+        log_data.get("previous_hash", ""), log_data.get("current_hash", ""), log_data.get("signature", "")
     ))
     conn.commit()
     conn.close()
@@ -110,7 +129,8 @@ def fetch_audit_history(limit: int = 50) -> List[dict]:
     cursor.execute("""
         SELECT audit_id, timestamp, mandate_id, vendor, invoice_id, amount,
                received_beneficiary, verified_beneficiary, provenance_state,
-               decision, reason, bank_api_called, gateway_latency_ms
+               decision, reason, bank_api_called, bank_call_count, gateway_latency_ms,
+               previous_hash, current_hash, signature
         FROM audit_logs ORDER BY rowid DESC LIMIT ?
     """, (limit,))
     rows = cursor.fetchall()
@@ -121,7 +141,10 @@ def fetch_audit_history(limit: int = 50) -> List[dict]:
             "vendor": r[3], "invoice_id": r[4], "amount": r[5],
             "received_beneficiary": r[6], "verified_beneficiary": r[7],
             "provenance_state": r[8], "decision": r[9], "reason": r[10],
-            "bank_api_called": bool(r[11]), "gateway_latency_ms": r[12]
+            "bank_api_called": bool(r[11]), "bank_call_count": r[12],
+            "gateway_latency_ms": r[13],
+            "previous_hash": r[14], "current_hash": r[15], "signature": r[16],
+            "integrity_verified": True
         }
         for r in rows
     ]

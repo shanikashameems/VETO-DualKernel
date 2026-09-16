@@ -48,6 +48,7 @@ export const App: React.FC = () => {
     total_attacks: 0,
     blocked_attacks: 0,
     allowed_clean: 0,
+    bank_call_count: 0,
     taint_detection_pct: 0.0,
     avg_latency_ms: 0.0,
     false_positive_pct: 0.0
@@ -83,7 +84,7 @@ export const App: React.FC = () => {
           setMetrics(mData);
         }
       } catch (err) {
-        // Safe fallback without raw stack trace exposure
+        // Safe fallback
       }
     };
 
@@ -96,7 +97,6 @@ export const App: React.FC = () => {
 
   const handleModeToggle = (newMode: boolean) => {
     setVetoMode(newMode);
-    // If a result is currently displayed, re-dispatch automatically under new mode so UI updates immediately
     if (dispatchResult) {
       setTimeout(() => {
         executeDispatch(newMode, documentType);
@@ -123,7 +123,6 @@ export const App: React.FC = () => {
       const data: DispatchResponse = await response.json();
       setDispatchResult(data);
 
-      // Fast streaming visual log playback (~1.2s total)
       if (data.logs && data.logs.length > 0) {
         for (let i = 0; i < data.logs.length; i++) {
           await new Promise((resolve) => setTimeout(resolve, 140));
@@ -158,7 +157,7 @@ export const App: React.FC = () => {
       const res = await fetch('/api/reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reset_metrics: false })
+        body: JSON.stringify({ reset_metrics: true })
       });
       if (res.ok) {
         const data = await res.json();
@@ -173,14 +172,13 @@ export const App: React.FC = () => {
     if (isRunningBenchmark) return;
     setIsRunningBenchmark(true);
     try {
-      const res = await fetch('/api/benchmark', {
+      const res = await fetch('/api/benchmark/matrix', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ count: 10 })
+        headers: { 'Content-Type': 'application/json' }
       });
       if (res.ok) {
         const data = await res.json();
-        setMetrics(data.metrics);
+        setMetrics(data.telemetry);
       }
     } catch (err) {
       // Safe fallback
@@ -196,11 +194,12 @@ export const App: React.FC = () => {
         vetoMode={vetoMode}
         setVetoMode={handleModeToggle}
         isBackendOnline={isBackendOnline}
+        bankCallCount={metrics.bank_call_count}
       />
 
       {/* MAIN 3-COLUMN CONSOLE (28% | 44% | 28%) */}
       <main className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-4 p-4 min-h-0 overflow-y-auto">
-        {/* LEFT COLUMN: THREAT INGESTION (28% -> 3 cols out of 12) */}
+        {/* LEFT COLUMN: THREAT INGESTION (28%) */}
         <div className="md:col-span-3 min-h-[500px]">
           <ThreatIngestion
             mandate={mandate}
@@ -213,7 +212,7 @@ export const App: React.FC = () => {
           />
         </div>
 
-        {/* CENTER COLUMN: DUAL-KERNEL LIVE EXECUTION (44% -> 6 cols out of 12) */}
+        {/* CENTER COLUMN: DUAL-KERNEL LIVE EXECUTION (44%) */}
         <div className="md:col-span-6 min-h-[500px]">
           <DualKernelTrace
             dispatchResult={dispatchResult}
@@ -223,7 +222,7 @@ export const App: React.FC = () => {
           />
         </div>
 
-        {/* RIGHT COLUMN: ENTERPRISE TRUTH (28% -> 3 cols out of 12) */}
+        {/* RIGHT COLUMN: ENTERPRISE TRUTH (28%) */}
         <div className="md:col-span-3 min-h-[500px]">
           <EnterpriseTruth
             vendors={vendors}

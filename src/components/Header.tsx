@@ -1,13 +1,14 @@
 import React from 'react';
-import { ShieldCheck, ShieldAlert, Activity, Cpu } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Activity, Cpu, Landmark } from 'lucide-react';
 
 interface HeaderProps {
   vetoMode: boolean;
   setVetoMode: (mode: boolean) => void;
   isBackendOnline: boolean;
+  bankCallCount: number;
 }
 
-export const Header: React.FC<HeaderProps> = ({ vetoMode, setVetoMode, isBackendOnline }) => {
+export const Header: React.FC<HeaderProps> = ({ vetoMode, setVetoMode, isBackendOnline, bankCallCount }) => {
   const activeProxy = typeof window !== 'undefined' && !window.location.hostname.includes('localhost')
     ? `${window.location.host}/api`
     : 'localhost:8000/veto';
@@ -27,19 +28,32 @@ export const Header: React.FC<HeaderProps> = ({ vetoMode, setVetoMode, isBackend
             </span>
           </div>
           <p className="text-xs text-gray-400 font-sans tracking-wide">
-            Autonomous Financial Agent Security
+            Zero-Trust Execution Gate for Agentic Finance
           </p>
         </div>
       </div>
 
-      {/* CENTER: Active Proxy Status */}
-      <div className="flex items-center space-x-3 bg-[#141720] px-4 py-2 rounded border border-gray-800 text-xs font-mono mb-3 md:mb-0">
+      {/* CENTER: Active Proxy Status & Visible bank_call_count */}
+      <div className="flex flex-wrap items-center justify-center gap-3 bg-[#141720] px-4 py-2 rounded border border-gray-800 text-xs font-mono mb-3 md:mb-0">
         <div className="flex items-center space-x-2">
           <Activity className="w-3.5 h-3.5 text-gray-400" />
-          <span className="text-gray-400">ACTIVE PROXY:</span>
+          <span className="text-gray-400">PROXY:</span>
           <span className="text-gray-200">{activeProxy}</span>
         </div>
-        <div className="h-3 w-px bg-gray-700 mx-1"></div>
+        
+        <div className="h-3 w-px bg-gray-700 hidden sm:block"></div>
+
+        {/* BANK CALL COUNT DISPLAY */}
+        <div className="flex items-center space-x-2 bg-[#0B0D13] px-3 py-1 rounded border border-blue-900/60 text-blue-300">
+          <Landmark className="w-3.5 h-3.5 text-blue-400" />
+          <span className="text-gray-400 text-[11px]">bank_call_count:</span>
+          <span className="font-bold text-sm text-emerald-400 font-mono" id="bank-call-count-header">
+            {bankCallCount}
+          </span>
+        </div>
+
+        <div className="h-3 w-px bg-gray-700 hidden sm:block"></div>
+
         {isBackendOnline ? (
           <div className="flex items-center space-x-1.5 text-emerald-400 font-semibold">
             <span className="relative flex h-2 w-2">
