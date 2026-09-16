@@ -39,6 +39,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+try:
+    init_db()
+except Exception:
+    pass
+
 @app.on_event("startup")
 def on_startup():
     init_db()
