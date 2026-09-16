@@ -1,20 +1,28 @@
 import sqlite3
 import os
+import shutil
 from pathlib import Path
 from typing import Optional, Dict, List
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DB_PATH = BASE_DIR / "data" / "veto.db"
 
-# Fallback to /tmp on Vercel serverless if data dir is read-only
-try:
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-except Exception:
-    DB_PATH = Path("/tmp/veto.db")
+def get_db_path() -> Path:
+    # On Vercel serverless environment (VERCEL=1), always write SQLite DB to writeable /tmp directory
+    if os.environ.get("VERCEL") == "1" or os.environ.get("VERCEL_ENV") or not os.access(BASE_DIR / "data", os.W_OK):
+        tmp_db = Path("/tmp/veto.db")
+        seed_db = BASE_DIR / "data" / "veto.db"
+        if not tmp_db.exists() and seed_db.exists():
+            try:
+                shutil.copy(seed_db, tmp_db)
+            except Exception:
+                pass
+        return tmp_db
+    return BASE_DIR / "data" / "veto.db"
 
 def init_db():
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
+    db_p = get_db_path()
+    db_p.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(db_p)
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS erp_vendors (
@@ -57,9 +65,8 @@ def init_db():
     conn.close()
 
 def get_verified_account(vendor_name: str) -> Optional[str]:
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
-    # Flexible match (e.g., "ABC Supplies" or "ABC Suppliers Ltd.")
     cursor.execute("SELECT verified_account FROM erp_vendors WHERE ? LIKE '%' || name || '%' OR name LIKE '%' || ? || '%'", (vendor_name, vendor_name))
     row = cursor.fetchone()
     conn.close()
@@ -68,7 +75,7 @@ def get_verified_account(vendor_name: str) -> Optional[str]:
     return None
 
 def get_all_vendors() -> List[Dict[str, str]]:
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
     cursor.execute("SELECT vendor_id, name, verified_account, status FROM erp_vendors")
     rows = cursor.fetchall()
@@ -79,7 +86,7 @@ def get_all_vendors() -> List[Dict[str, str]]:
     ]
 
 def save_audit_log(log_data: dict):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO audit_logs (
@@ -98,7 +105,7 @@ def save_audit_log(log_data: dict):
     conn.close()
 
 def fetch_audit_history(limit: int = 50) -> List[dict]:
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
     cursor.execute("""
         SELECT audit_id, timestamp, mandate_id, vendor, invoice_id, amount,
