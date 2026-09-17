@@ -1,0 +1,66 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🚀 Start VETO Backend (FastAPI)",
+      "type": "shell",
+      "command": "cmd /c \"set PYTHONPATH=D:\\Veto && python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000\"",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "veto-stack"
+      }
+    },
+    {
+      "label": "⚡ Start VETO Frontend (Vite)",
+      "type": "shell",
+      "command": "cmd /c \"npm run dev\"",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "veto-stack"
+      }
+    },
+    {
+      "label": "🔥 START VETO-DUALKERNEL (FULL STACK)",
+      "type": "shell",
+      "dependsOn": [
+        "🚀 Start VETO Backend (FastAPI)",
+        "⚡ Start VETO Frontend (Vite)"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🧪 Run 20-Case Security Benchmark Suite",
+      "type": "shell",
+      "command": "cmd /c \"set PYTHONPATH=D:\\Veto && python -m pytest backend/tests/test_veto.py -v\"",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "🌐 Vercel Local CLI Preview",
+      "type": "shell",
+      "command": "npx vercel dev",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ]
+}
