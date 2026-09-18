@@ -87,11 +87,15 @@ export const EnterpriseTruth: React.FC<EnterpriseTruthProps> = ({
   return (
     <div className="bg-[#F4F1EA] border border-[#E2E8F0] rounded-lg p-3.5 flex flex-col space-y-3.5 shadow-sm h-full overflow-y-auto custom-scrollbar">
       {/* STEP 3 BADGE & SECTION TITLE */}
-      <div className="flex flex-col space-y-1 border-b border-gray-300 pb-2">
-        <span className="text-[10px] font-mono font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded border border-blue-300 w-fit">
-          STEP 3: LINEAGE & PROOF (Graph & Audit)
-        </span>
-        <div className="flex items-center justify-between pt-1">
+      <div className="flex flex-col space-y-1.5 border-b border-gray-300 pb-2.5">
+        <div className="flex items-center space-x-2">
+          <span className="text-[11px] font-mono font-extrabold text-white bg-emerald-700 px-2.5 py-1 rounded-md shadow-xs border border-emerald-600 uppercase tracking-wide flex items-center space-x-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+            <span>STEP 3: LINEAGE & PROOF</span>
+            <span className="text-emerald-100 font-medium text-[10px]">(Graph & Audit)</span>
+          </span>
+        </div>
+        <div className="flex items-center justify-between pt-0.5">
           <h2 className="text-xs font-bold tracking-wider text-gray-900 font-mono uppercase flex items-center space-x-2">
             <Database className="w-4 h-4 text-blue-600" />
             <span>ENTERPRISE TRUTH</span>

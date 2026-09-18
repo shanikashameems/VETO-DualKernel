@@ -43,10 +43,12 @@ export const DualKernelTrace: React.FC<DualKernelTraceProps> = ({
         </div>
         
         <div className="flex items-center space-x-2">
-          <span className="text-[10px] font-mono font-bold text-blue-300 bg-blue-950 px-2 py-0.5 rounded border border-blue-700">
-            STEP 2: RUNTIME INTERCEPTION (Watch the Logs)
+          <span className="text-[11px] font-mono font-extrabold text-amber-300 bg-amber-950/90 px-2.5 py-1 rounded-md border border-amber-600 shadow-xs flex items-center space-x-1.5 uppercase tracking-wide">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+            <span>STEP 2: RUNTIME INTERCEPTION</span>
+            <span className="text-amber-200/80 font-medium text-[10px]">(Watch the Logs)</span>
           </span>
-          <Terminal className="w-4 h-4 text-blue-400" />
+          <Terminal className="w-4 h-4 text-amber-400" />
         </div>
       </div>
 
