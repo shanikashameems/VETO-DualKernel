@@ -101,6 +101,11 @@ export const TelemetryFooter: React.FC<TelemetryFooterProps> = ({
           </div>
         </div>
 
+        {/* CENTER: Architecture Disclaimer */}
+        <div className="text-[10.5px] text-gray-400 font-mono bg-gray-900/60 px-3 py-1 rounded border border-gray-800/80 my-1 md:my-0 text-center max-w-md">
+          Interactive Client-Side Demonstration Console simulating the local FastAPI VETO-DualKernel middleware proxy (D:\Veto).
+        </div>
+
         {/* RIGHT: Action controls */}
         <div className="flex items-center space-x-3 w-full md:w-auto justify-end">
           <button

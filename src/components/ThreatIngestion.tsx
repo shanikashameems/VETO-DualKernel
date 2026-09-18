@@ -27,14 +27,20 @@ export const ThreatIngestion: React.FC<ThreatIngestionProps> = ({
 
   return (
     <div className="bg-[#F4F1EA] border border-[#E2E8F0] rounded-lg p-3.5 flex flex-col space-y-3 shadow-sm h-full overflow-y-auto custom-scrollbar">
-      <div className="flex items-center justify-between border-b border-gray-300 pb-2">
-        <h2 className="text-xs font-bold tracking-wider text-gray-900 font-mono uppercase flex items-center space-x-2">
-          <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-          <span>THREAT INGESTION</span>
-        </h2>
-        <span className="text-[10px] font-mono bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-300 font-semibold">
-          UNTRUSTED CONTEXT
+      {/* STEP 1 BADGE & HEADER */}
+      <div className="flex flex-col space-y-1 border-b border-gray-300 pb-2">
+        <span className="text-[10px] font-mono font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded border border-blue-300 w-fit">
+          STEP 1: INGESTION (Pick an Invoice)
         </span>
+        <div className="flex items-center justify-between pt-1">
+          <h2 className="text-xs font-bold tracking-wider text-gray-900 font-mono uppercase flex items-center space-x-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+            <span>THREAT INGESTION</span>
+          </h2>
+          <span className="text-[9px] font-mono bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-300 font-semibold">
+            UNTRUSTED CONTEXT
+          </span>
+        </div>
       </div>
 
       {/* 9.1 HUMAN MANDATE CARD */}

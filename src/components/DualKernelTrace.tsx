@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Terminal, ShieldAlert, ShieldCheck, CheckCircle2, AlertOctagon, Landmark } from 'lucide-react';
+import { Terminal, ShieldAlert, ShieldCheck, CheckCircle2, AlertOctagon } from 'lucide-react';
 import { DispatchResponse, DispatchStageLog } from '../types';
 
 interface DualKernelTraceProps {
@@ -29,21 +29,24 @@ export const DualKernelTrace: React.FC<DualKernelTraceProps> = ({
 
   return (
     <div className="bg-[#141720] border border-gray-800 rounded-lg flex flex-col h-full shadow-xl overflow-hidden">
-      {/* TERMINAL HEADER */}
-      <div className="bg-[#0B0D13] px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+      {/* TERMINAL HEADER WITH STEP 2 BADGE */}
+      <div className="bg-[#0B0D13] px-4 py-3 border-b border-gray-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <div className="flex items-center space-x-2">
           <div className="flex space-x-1.5">
             <span className="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
             <span className="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
             <span className="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
           </div>
-          <span className="text-xs font-mono font-bold text-gray-400 ml-2">
+          <span className="text-xs font-mono font-bold text-gray-300 ml-2">
             VETO-DUALKERNEL LIVE SECURITY TRACE
           </span>
         </div>
+        
         <div className="flex items-center space-x-2">
+          <span className="text-[10px] font-mono font-bold text-blue-300 bg-blue-950 px-2 py-0.5 rounded border border-blue-700">
+            STEP 2: RUNTIME INTERCEPTION (Watch the Logs)
+          </span>
           <Terminal className="w-4 h-4 text-blue-400" />
-          <span className="text-[11px] font-mono text-gray-400">CONSOLE ACTIVE</span>
         </div>
       </div>
 
@@ -52,8 +55,10 @@ export const DualKernelTrace: React.FC<DualKernelTraceProps> = ({
         {!dispatchResult && visibleLogs.length === 0 && !isDispatching && (
           <div className="h-full flex flex-col items-center justify-center text-gray-600 space-y-2 py-16">
             <Terminal className="w-10 h-10 text-gray-700 mb-1" />
-            <p className="font-mono text-sm text-gray-400">AWAITING DISPATCH TRIGGER</p>
-            <p className="text-xs text-gray-600">Click [ DISPATCH TO AGENT ] to initiate zero-trust execution trace</p>
+            <p className="font-mono text-sm text-gray-400 font-bold">AWAITING DISPATCH TRIGGER</p>
+            <p className="text-xs text-gray-500 max-w-md text-center">
+              Click <strong className="text-blue-400">[ DISPATCH TO AGENT ]</strong> in Step 1 to initiate zero-trust execution trace
+            </p>
           </div>
         )}
 
@@ -146,82 +151,92 @@ export const DualKernelTrace: React.FC<DualKernelTraceProps> = ({
           </div>
         )}
 
-        {/* FINAL ACTUATION KERNEL OUTCOME (STAGE 3) */}
+        {/* HIGH-IMPACT OUTCOME STATUS CARDS (STAGE 3) */}
         {evaluation && visibleLogs.some(l => l.stage === 'STAGE 3' && (l.message.includes('HTTP 200') || l.message.includes('VETO BLOCK') || l.message.includes('ABORT'))) && (
           <div className="mt-4 pt-2">
             {decision === 'BLOCK' ? (
-              /* VETO ON & BLOCKED OUTCOME */
-              <div className="bg-emerald-950/90 border-2 border-emerald-500 rounded-lg p-4 text-emerald-100 shadow-lg space-y-2">
-                <div className="flex items-center justify-between border-b border-emerald-800/80 pb-2">
-                  <div className="flex items-center space-x-2">
-                    <ShieldCheck className="w-6 h-6 text-emerald-400" />
+              /* VETO ON & BLOCKED OUTCOME (ATTACK NEUTRALIZED) */
+              <div className="bg-emerald-950/95 border-2 border-emerald-500 rounded-lg p-4 text-emerald-100 shadow-xl space-y-2.5">
+                <div className="flex items-center justify-between border-b border-emerald-800/80 pb-2.5">
+                  <div className="flex items-center space-x-2.5">
+                    <ShieldCheck className="w-7 h-7 text-emerald-400 shrink-0" />
                     <div>
-                      <span className="font-bold text-sm text-emerald-300 font-mono tracking-wide block">
-                        EXECUTION BOUNDARY PROVED — ZERO FUNDS MOVED
-                      </span>
-                      <span className="text-[10px] text-emerald-400/80 font-mono">
-                        TAINTED ➔ VETO BLOCK ➔ bank_call_count = {bankCalls}
+                      <h3 className="font-bold text-base text-emerald-300 font-mono tracking-wide">
+                        🛡️ VETO ON — ATTACK NEUTRALIZED
+                      </h3>
+                      <span className="text-[10px] text-emerald-400/90 font-mono font-bold">
+                        EXECUTION GATE ENFORCED ➔ bank_call_count = {bankCalls}
                       </span>
                     </div>
                   </div>
-                  <span className="bg-emerald-900 text-emerald-200 text-xs px-2.5 py-1 rounded border border-emerald-600 font-bold">
+                  <span className="bg-emerald-900 text-emerald-200 text-xs px-3 py-1 rounded border border-emerald-600 font-bold font-mono">
                     HTTP 403 FORBIDDEN
                   </span>
                 </div>
-                <div className="text-xs font-mono space-y-1 text-emerald-200/90">
-                  <p>✓ VETO Gateway intercepted tainted parameter before network egress.</p>
-                  <p>✓ Local Mock Banking API was NEVER called (bank_call_count = {bankCalls}).</p>
-                  <p className="text-emerald-400 font-bold">Target Account: {evaluation.received_account} (BLOCKED)</p>
-                  <p className="text-emerald-300 font-bold">Transaction Amount: ₹5,00,000 (PROTECTED)</p>
+                <div className="text-xs font-mono space-y-1.5 text-emerald-100 leading-relaxed">
+                  <p className="font-bold text-emerald-200">
+                    Zero Funds Moved (HTTP 403 Forbidden). Parameter #9928 was injected by untrusted context and rejected by the registry. The bank API was never called.
+                  </p>
+                  <div className="pt-1 text-[11px] text-emerald-300/90 border-t border-emerald-900 grid grid-cols-2 gap-2">
+                    <div>✓ Protected Amount: <strong className="text-white">₹5,00,000</strong></div>
+                    <div>✓ Target #9928: <strong className="text-emerald-400">REJECTED</strong></div>
+                  </div>
                 </div>
               </div>
             ) : isTainted ? (
-              /* VETO OFF & EXFILTRATED OUTCOME */
-              <div className="bg-red-950/90 border-2 border-red-500 rounded-lg p-4 text-red-100 shadow-lg space-y-2 animate-bounce-once">
-                <div className="flex items-center justify-between border-b border-red-800/80 pb-2">
-                  <div className="flex items-center space-x-2">
-                    <ShieldAlert className="w-6 h-6 text-red-400" />
+              /* VETO OFF & EXFILTRATED OUTCOME (EXPLOIT SUCCEEDED) */
+              <div className="bg-red-950/95 border-2 border-red-500 rounded-lg p-4 text-red-100 shadow-xl space-y-2.5 animate-bounce-once">
+                <div className="flex items-center justify-between border-b border-red-800/80 pb-2.5">
+                  <div className="flex items-center space-x-2.5">
+                    <ShieldAlert className="w-7 h-7 text-red-400 shrink-0 animate-pulse" />
                     <div>
-                      <span className="font-bold text-sm text-red-200 font-mono tracking-wide block">
-                        PAYMENT EXECUTED — CORPORATE LOSS DETECTED
-                      </span>
-                      <span className="text-[10px] text-red-300 font-mono">
-                        TAINTED ➔ VETO BYPASSED ➔ bank_call_count = {bankCalls}
+                      <h3 className="font-bold text-base text-red-200 font-mono tracking-wide">
+                        🚨 VETO OFF — EXPLOIT SUCCEEDED
+                      </h3>
+                      <span className="text-[10px] text-red-300 font-mono font-bold">
+                        EXECUTION GATE BYPASSED ➔ bank_call_count = {bankCalls}
                       </span>
                     </div>
                   </div>
-                  <span className="bg-red-900 text-red-200 text-xs px-2.5 py-1 rounded border border-red-600 font-bold">
+                  <span className="bg-red-900 text-red-200 text-xs px-3 py-1 rounded border border-red-600 font-bold font-mono">
                     HTTP 200 OK
                   </span>
                 </div>
-                <div className="text-xs font-mono space-y-1 text-red-200">
-                  <p className="font-bold text-red-300 text-sm">₹5,00,000 EXFILTRATED TO MALICIOUS ACCOUNT {evaluation.received_account}</p>
-                  <p>⚠️ VETO execution gate was DISABLED. Tainted parameters reached privileged bank API.</p>
+                <div className="text-xs font-mono space-y-1.5 text-red-100 leading-relaxed">
+                  <p className="font-bold text-red-200 text-sm">
+                    ₹5,00,000 sent to Attacker Account #9928. The AI agent had valid credentials, so the bank blindly moved the money.
+                  </p>
+                  <p className="text-red-300 text-[11px]">
+                    ⚠️ VETO execution gate was DISABLED. Tainted parameters reached privileged bank API without causal provenance checks.
+                  </p>
                 </div>
               </div>
             ) : (
               /* CLEAN INVOICE ALLOWED OUTCOME */
-              <div className="bg-blue-950/90 border-2 border-blue-500 rounded-lg p-4 text-blue-100 shadow-lg space-y-2">
-                <div className="flex items-center justify-between border-b border-blue-800/80 pb-2">
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle2 className="w-6 h-6 text-blue-400" />
+              <div className="bg-blue-950/95 border-2 border-blue-500 rounded-lg p-4 text-blue-100 shadow-xl space-y-2.5">
+                <div className="flex items-center justify-between border-b border-blue-800/80 pb-2.5">
+                  <div className="flex items-center space-x-2.5">
+                    <CheckCircle2 className="w-7 h-7 text-blue-400 shrink-0" />
                     <div>
-                      <span className="font-bold text-sm text-blue-200 font-mono tracking-wide block">
-                        PROVENANCE VERIFIED — PAYMENT ALLOWED
-                      </span>
-                      <span className="text-[10px] text-blue-300 font-mono">
-                        VERIFIED ➔ VETO ALLOW ➔ bank_call_count = {bankCalls}
+                      <h3 className="font-bold text-base text-blue-200 font-mono tracking-wide">
+                        ✅ PROVENANCE VERIFIED — PAYMENT ALLOWED
+                      </h3>
+                      <span className="text-[10px] text-blue-300 font-mono font-bold">
+                        VERIFIED MATCH ➔ bank_call_count = {bankCalls}
                       </span>
                     </div>
                   </div>
-                  <span className="bg-blue-900 text-blue-200 text-xs px-2.5 py-1 rounded border border-blue-600 font-bold">
+                  <span className="bg-blue-900 text-blue-200 text-xs px-3 py-1 rounded border border-blue-600 font-bold font-mono">
                     HTTP 200 OK
                   </span>
                 </div>
-                <div className="text-xs font-mono space-y-1 text-blue-200">
-                  <p>✓ Beneficiary account matches verified enterprise vendor registry ({evaluation.expected_account}).</p>
-                  <p>✓ Mock payment of ₹5,00,000 settled with signed VETO token.</p>
-                  <p className="text-emerald-400 font-bold">bank_call_count = {bankCalls}</p>
+                <div className="text-xs font-mono space-y-1.5 text-blue-100 leading-relaxed">
+                  <p className="font-bold text-blue-200">
+                    ₹5,00,000 settled safely to verified Enterprise Account #1234 with cryptographically signed VETO token.
+                  </p>
+                  <p className="text-[11px] text-blue-300">
+                    ✓ Beneficiary account matches verified enterprise vendor registry ({evaluation.expected_account}).
+                  </p>
                 </div>
               </div>
             )}

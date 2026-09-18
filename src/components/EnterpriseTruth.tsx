@@ -86,15 +86,20 @@ export const EnterpriseTruth: React.FC<EnterpriseTruthProps> = ({
 
   return (
     <div className="bg-[#F4F1EA] border border-[#E2E8F0] rounded-lg p-3.5 flex flex-col space-y-3.5 shadow-sm h-full overflow-y-auto custom-scrollbar">
-      {/* SECTION TITLE */}
-      <div className="flex items-center justify-between border-b border-gray-300 pb-2">
-        <h2 className="text-xs font-bold tracking-wider text-gray-900 font-mono uppercase flex items-center space-x-2">
-          <Database className="w-4 h-4 text-blue-600" />
-          <span>ENTERPRISE TRUTH</span>
-        </h2>
-        <span className="text-[10px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded border border-blue-300 font-semibold">
-          ERP AUTHORITATIVE
+      {/* STEP 3 BADGE & SECTION TITLE */}
+      <div className="flex flex-col space-y-1 border-b border-gray-300 pb-2">
+        <span className="text-[10px] font-mono font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded border border-blue-300 w-fit">
+          STEP 3: LINEAGE & PROOF (Graph & Audit)
         </span>
+        <div className="flex items-center justify-between pt-1">
+          <h2 className="text-xs font-bold tracking-wider text-gray-900 font-mono uppercase flex items-center space-x-2">
+            <Database className="w-4 h-4 text-blue-600" />
+            <span>ENTERPRISE TRUTH</span>
+          </h2>
+          <span className="text-[10px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded border border-blue-300 font-semibold">
+            ERP AUTHORITATIVE
+          </span>
+        </div>
       </div>
 
       {/* 12.1 VERIFIED VENDOR REGISTRY */}
