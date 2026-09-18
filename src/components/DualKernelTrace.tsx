@@ -76,16 +76,23 @@ export const DualKernelTrace: React.FC<DualKernelTraceProps> = ({
         </div>
 
         {/* CANDIDATE PARAMETERS BOX (STAGE 1) */}
-        {candidates && visibleLogs.some(l => l.stage === 'STAGE 1' && l.message.includes('emitted')) && (
-          <div className="bg-[#1A1E2E] border border-blue-900/60 rounded p-3 text-xs space-y-1.5 my-2">
-            <div className="text-[11px] font-bold text-blue-400 uppercase tracking-wider mb-1 flex justify-between">
-              <span>[KERNEL 01] PROPOSED CANDIDATE PARAMETERS</span>
-              <span className="text-gray-400 text-[10px]">SANDBOXED INGESTION</span>
+        {candidates && (visibleLogs.length >= 2 || !isDispatching) && (
+          <div className="bg-[#141A29] border border-blue-900/60 rounded p-3 space-y-2 my-2">
+            <div className="text-[11px] font-bold text-blue-400 uppercase tracking-wider flex items-center justify-between">
+              <span>[STAGE 1] CANDIDATE PARAMETERS EXTRACTED</span>
+              <span className="text-gray-400 text-[10px]">READ-ONLY SANDBOX</span>
             </div>
-            <div className="grid grid-cols-2 gap-2 text-gray-300">
-              <div><span className="text-gray-500">vendor:</span> <span className="text-white font-bold">"{candidates.vendor}"</span></div>
-              <div><span className="text-gray-500">invoice_id:</span> <span className="text-white">"#{candidates.invoice_id}"</span></div>
-              <div><span className="text-gray-500">amount:</span> <span className="text-emerald-400 font-bold">₹5,00,000</span></div>
+
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <span className="text-gray-500">vendor:</span> <span className="text-white font-semibold">"{candidates.vendor}"</span>
+              </div>
+              <div>
+                <span className="text-gray-500">invoice_id:</span> <span className="text-white font-semibold">"{candidates.invoice_id}"</span>
+              </div>
+              <div>
+                <span className="text-gray-500">amount:</span> <span className="text-emerald-400 font-bold">₹5,00,000</span>
+              </div>
               <div>
                 <span className="text-gray-500">beneficiary_account:</span>{' '}
                 <span className={`font-bold ${candidates.has_injection ? 'text-red-400 underline decoration-red-500' : 'text-emerald-400'}`}>
@@ -97,7 +104,7 @@ export const DualKernelTrace: React.FC<DualKernelTraceProps> = ({
         )}
 
         {/* LINEAGE & NODE ORIGIN RECONCILIATION BOX (STAGE 2) */}
-        {evaluation && visibleLogs.some(l => l.stage === 'STAGE 2') && (
+        {evaluation && (visibleLogs.length >= 4 || !isDispatching) && (
           <div className="bg-[#1C1520] border border-red-900/40 rounded p-3 space-y-2 my-2">
             <div className="text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center justify-between">
               <span>[STAGE 2] CAUSAL LINEAGE & NODE ORIGIN TRACE</span>
@@ -153,8 +160,8 @@ export const DualKernelTrace: React.FC<DualKernelTraceProps> = ({
           </div>
         )}
 
-        {/* HIGH-IMPACT OUTCOME STATUS CARDS (STAGE 3) */}
-        {evaluation && visibleLogs.some(l => l.stage === 'STAGE 3' && (l.message.includes('HTTP 200') || l.message.includes('VETO BLOCK') || l.message.includes('ABORT'))) && (
+        {/* HIGH-IMPACT OUTCOME STATUS CARDS */}
+        {evaluation && (!isDispatching || visibleLogs.length >= 4) && (
           <div className="mt-4 pt-2">
             {decision === 'BLOCK' ? (
               /* VETO ON & BLOCKED OUTCOME (ATTACK NEUTRALIZED) */
