@@ -16,7 +16,6 @@ export const EnterpriseTruth: React.FC<EnterpriseTruthProps> = ({
   const [copied, setCopied] = useState(false);
   const [integrityStatus, setIntegrityStatus] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [bypassTestResult, setBypassTestResult] = useState<string | null>(null);
 
   const candidates = dispatchResult?.candidate_parameters;
   const audit = dispatchResult?.audit;
@@ -71,16 +70,6 @@ export const EnterpriseTruth: React.FC<EnterpriseTruthProps> = ({
       setIntegrityStatus("INTEGRITY: TAMPER DETECTED ✗ (HASH MISMATCH)");
     } finally {
       setIsVerifying(false);
-    }
-  };
-
-  const handleTestDirectBypass = async () => {
-    try {
-      const res = await fetch('/api/bank-mock/direct-attack', { method: 'POST' });
-      const data = await res.json();
-      setBypassTestResult("401 UNAUTHORIZED — Direct tool call rejected (Missing VETO token)");
-    } catch (err) {
-      setBypassTestResult("401 UNAUTHORIZED — Direct tool call rejected");
     }
   };
 
@@ -366,23 +355,6 @@ export const EnterpriseTruth: React.FC<EnterpriseTruthProps> = ({
             <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
             <span>[ TEST TAMPER DETECT ]</span>
           </button>
-        </div>
-
-        {/* BYPASS RESISTANCE DIRECT CALL TEST */}
-        <div className="pt-1.5 border-t border-gray-200 space-y-1">
-          <button
-            onClick={handleTestDirectBypass}
-            className="w-full py-2 px-3 bg-gray-900 hover:bg-black border border-gray-700 rounded-md text-[10px] font-mono font-bold text-amber-300 flex items-center justify-center space-x-1.5 transition-all shadow-xs"
-            id="test-direct-bypass-btn"
-          >
-            <Key className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span>[ TEST DIRECT TOOL CALL (REQUIRE VETO TOKEN) ]</span>
-          </button>
-          {bypassTestResult && (
-            <div className="text-[9px] font-mono bg-amber-950/90 text-amber-200 p-2 rounded border border-amber-600 font-semibold shadow-xs">
-              {bypassTestResult}
-            </div>
-          )}
         </div>
       </div>
     </div>
